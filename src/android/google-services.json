@@ -1,0 +1,180 @@
+{
+  "project_info": {
+    "project_number": "172567974334",
+    "firebase_url": "https://mobilidad-e8a30.firebaseio.com",
+    "project_id": "mobilidad-e8a30",
+    "storage_bucket": "mobilidad-e8a30.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172567974334:android:764d2cb7da3280eb",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-2zTaWbXnX1WAQBtxJnp-0bFGgtw3_74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172567974334:android:02a00d0b1a416988",
+        "android_client_info": {
+          "package_name": "io.salem.logindemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172567974334-3ldrvoi53nkk5hb24o8h93cjut04tm2r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.salem.logindemo",
+            "certificate_hash": "8cf9e040634501a25480e917e2257378e61428b6"
+          }
+        },
+        {
+          "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-2zTaWbXnX1WAQBtxJnp-0bFGgtw3_74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172567974334:android:fdfd6d3149ae3db9",
+        "android_client_info": {
+          "package_name": "io.salem.miniapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172567974334-tafo9m3tiv2vnnhq45n4nvka379mtrhk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.salem.miniapp",
+            "certificate_hash": "8cf9e040634501a25480e917e2257378e61428b6"
+          }
+        },
+        {
+          "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-2zTaWbXnX1WAQBtxJnp-0bFGgtw3_74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172567974334:android:272aa62737faebb3",
+        "android_client_info": {
+          "package_name": "mx.bancosabadell.part.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172567974334-3ofupl136297kvqc8v9rrok54qkidr8o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mx.bancosabadell.part.debug",
+            "certificate_hash": "b51ae98318343108a45adab5724dbd90456d28e1"
+          }
+        },
+        {
+          "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-2zTaWbXnX1WAQBtxJnp-0bFGgtw3_74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172567974334:android:cdde60420cb4b386",
+        "android_client_info": {
+          "package_name": "mx.bancosabadell.part.rc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-2zTaWbXnX1WAQBtxJnp-0bFGgtw3_74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172567974334-4rovacspjk7gmaogf2kat11gb9t25enl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
