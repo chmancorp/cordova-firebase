@@ -99,10 +99,12 @@ static AppDelegate *appDelegate;
     // Guardo el callbackId y mando a llamar al init de Firebase
     callbackId = command.callbackId;
 
+    // Si aun no inicializo el tokenBanxico, inicializo Firebase, de lo contrario me lo salto.
     if (self.tokenBanxico == nil) {
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         [miDelegate inicializaFirebase:googleId];
     } else {
+        NSLog(@"Segunda / tercera llamada a echo, NO inicializo Firebase");
         [[FirebasePlugin firebasePlugin] echoResult:self.tokenBanxico];
     }
 }
