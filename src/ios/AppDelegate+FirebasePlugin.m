@@ -264,6 +264,15 @@
     NSMutableArray *mcs = [array mutableCopy];
     // Busco en los mensajes anteriores
     
+    // Agrego banderas adicionales para ionic
+    if ([mutableUserInfo objectForKey:@"payreq"] != nil) {
+        [mutableUserInfo setValue:@"true" forKey:@"isPayReq"];
+    } else {
+        [mutableUserInfo setValue:@"false" forKey:@"isPayReq"];
+    }
+    NSNumber *tiempo = [NSNumber numberWithDouble:<#(double)#>];
+    [mutableUserInfo setValue:[tiempo stringValue] forKey:@"hnr"];
+    
     // Guardo el nuevo JSON
     [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
 
