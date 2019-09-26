@@ -89,8 +89,6 @@ static AppDelegate *appDelegate;
     }
 }
 
-
-
 /** echo del idN */
 - (void)echo:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a echo");
@@ -111,8 +109,25 @@ static AppDelegate *appDelegate;
 
 - (void)getMCSaved:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a getMCSaved");
-    callbackId = command.callbackId;
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
+
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [prefs objectForKey:@"mcs"];
+
+    NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
+    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:mensajes];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)getAllNotifications:(CDVInvokedUrlCommand *)command {
+    NSLog(@"Entrando a getMCSaved");
+
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [prefs objectForKey:@"allNotifications"];
+
+    NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
+    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:mensajes];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 

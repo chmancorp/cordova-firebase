@@ -131,6 +131,17 @@
     [FIRMessaging messaging].delegate = self;
 
     self.applicationInBackground = @(YES);
+    
+    /* Para resetear todas las notificaciones guardadas
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *dict = [defaults dictionaryRepresentation];
+    for (id key in dict) {
+        [defaults removeObjectForKey:key];
+    }
+    [defaults synchronize];
+    NSLog(@"Preferencias guardadas: %@", [defaults objectForKey:@"mensajes"]);
+     */
+
 
     return YES;
 }
@@ -213,23 +224,12 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
-    NSDictionary *mutableUserInfo = [userInfo mutableCopy];
-
-    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
-    // Print full message.
-    NSLog(@"Mensaje recibido didReceiveRemoteNotification fetchCompletionHandler %@", mutableUserInfo);
     completionHandler(UIBackgroundFetchResultNewData);
 
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    //NSString *mensajesAnteriores = [prefs objectForKey:@"mensajes"];
-    //[prefs setObject:[NSString stringWithFormat:mensajesAnteriores, @"|", [mutableUserInfo objectForKey:@"data"]] forKey:@"mensajes"];
-    //[prefs setObject:[NSString stringWithFormat:mensajesAnteriores, @"|", notification.request.content.userInfo] forKey:@"mensajes"];
-    [prefs setObject:mutableUserInfo forKey:@"mensajes"];
-    [prefs synchronize];
-    
-    NSLog(@"Preferencias guardadas: %@", [prefs objectForKey:@"mensajes"]);
+    NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
-    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+    [self procesaNotificacion:mutableUserInfo];
+
 }
 
 // [START ios_10_data_message]
@@ -249,6 +249,35 @@
 
 // [END ios_10_data_message]
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+- (void)procesaNotificacion:(NSDictionary *)mutableUserInfo {
+    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
+    
+    // Print full message.
+    NSLog(@"%@", mutableUserInfo);
+    
+    // Guardo la notificacion en UserDefaults, concatenando con un pipe
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [prefs objectForKey:@"mcs"];
+    if (array == nil) {
+        array = [[NSArray alloc] init];
+    }
+    NSMutableArray *mcs = [array mutableCopy];
+    // Busco en los mensajes anteriores
+    
+    // Guardo el nuevo JSON
+    [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
+
+    [prefs setObject:[mcs copy] forKey:@"mcs"];
+    // Por ahora guardo el objeto allNotifications identico al mcs
+    [prefs setObject:[mcs copy] forKey:@"allNotifications"];
+    [prefs synchronize];
+    
+    NSLog(@"Preferencias guardadas: %@", [prefs objectForKey:@"mcs"]);
+    
+    // Mando la notificacion via el plugin
+    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+}
+
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
@@ -260,30 +289,12 @@
 
     if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
         return;
+    
+    completionHandler(UNNotificationPresentationOptionAlert);
 
     NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
 
-    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
-
-    // Print full message.
-    NSLog(@"%@", mutableUserInfo);
-
-    completionHandler(UNNotificationPresentationOptionAlert);
-    
-    // Guardo la notificacion en UserDefaults, concatenando con un pipe
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    NSString *mensajesAnteriores = [prefs objectForKey:@"mensajes"];
-    NSLog(@"Mensajes anteriores guardados: %@", mensajesAnteriores);
-    
-    [prefs setObject:[NSString stringWithFormat:@"%@|%@", mensajesAnteriores, [mutableUserInfo objectForKey:@"data"]] forKey:@"mensajes"];
-    //[prefs setObject:[NSString stringWithFormat:mensajesAnteriores, @"|", notification.request.content.userInfo] forKey:@"mensajes"];
-    //[prefs setObject:mutableUserInfo forKey:@"mensajes"];
-    [prefs synchronize];
-    
-    NSLog(@"Preferencias guardadas: %@", [prefs objectForKey:@"mensajes"]);
-    
-    // Mando la notificacion via el plugin
-    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+    [self procesaNotificacion:mutableUserInfo];
 }
 
 - (void) userNotificationCenter:(UNUserNotificationCenter *)center
