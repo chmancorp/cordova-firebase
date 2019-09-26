@@ -126,7 +126,8 @@
     
     [[UIApplication sharedApplication] registerForRemoteNotifications];
     
-    //[self inicializaFirebase];
+    // Inicializo el proyecto privado de Firebase
+    //[self inicializaFirebase:@"476818337671"];
     [FIRMessaging messaging].delegate = self;
 
     self.applicationInBackground = @(YES);

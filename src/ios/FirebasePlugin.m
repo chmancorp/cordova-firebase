@@ -76,20 +76,17 @@ static AppDelegate *appDelegate;
     [[NSNotificationCenter defaultCenter] postNotificationName:
      @"FCMToken" object:nil userInfo:dataDict];
     
-    if (self.tokenPrivado == nil) {
-        self.tokenPrivado = fcmToken;
+    if (self.tokenBanxico == nil) {
+        self.tokenBanxico = fcmToken;
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         
-        // Inicializo el proyecto de Banxico
-        [miDelegate inicializaFirebase:@"201247069219"];
+        // Inicializo el proyecto privado de Firebase
+        [miDelegate inicializaFirebase:@"476818337671"];
     } else {
-        self.tokenBanxico = fcmToken;
+        self.tokenPrivado = fcmToken;
         // Notifico a Ionic
         [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
     }
-    
-    // Notifico a Ionic
-    //[[FirebasePlugin firebasePlugin] echoResult:fcmToken];
 }
 
 
@@ -104,8 +101,12 @@ static AppDelegate *appDelegate;
     // Guardo el callbackId y mando a llamar al init de Firebase
     callbackId = command.callbackId;
 
-    AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
-    [miDelegate inicializaFirebase:googleId];
+    if (self.tokenBanxico == nil) {
+        AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
+        [miDelegate inicializaFirebase:googleId];
+    } else {
+        [[FirebasePlugin firebasePlugin] echoResult:self.tokenBanxico];
+    }
 }
 
 - (void)getMCSaved:(CDVInvokedUrlCommand *)command {
