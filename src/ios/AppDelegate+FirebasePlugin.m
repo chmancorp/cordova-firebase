@@ -59,35 +59,13 @@
             NSLog(@"App borrada: %d", sePudoBorrar);
         }];
     
-    /*
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    // si lo encuentro, lo uso.
-    if(filePath){
-        NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
-        // create firebase configure options passing .plist as content
-        //FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
-        FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:[NSString stringWithFormat: @"1:%@:ios:d681bfac3039b2ea", googleId]
-                                                          GCMSenderID:googleId];
-        
-        //[options setProjectID:@"201247069219"];
-        //[options setGoogleAppID:@"1:201247069219:ios:d681bfac3039b2ea"];
-        NSLog(@"google app id: %@", [options googleAppID]);
-        
-        [FIRApp configureWithOptions:options];
-    }
-    
-    // no .plist found, try default App
-    if (![FIRApp defaultApp] && !filePath) {
-        NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
-        [FIRApp configure];
-    }
-     */
     FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:[NSString stringWithFormat: @"1:%@:ios:8784fa2beeaa8732462d22", googleId]
                                                       GCMSenderID:googleId];
     
     NSLog(@"google app id: %@", [options googleAppID]);
     
     [FIRApp configureWithOptions:options];
+    //[FIRApp configureWithName:googleId options:options];
 
     /*
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
@@ -262,20 +240,40 @@
         array = [[NSArray alloc] init];
     }
     NSMutableArray *mcs = [array mutableCopy];
-    // Busco en los mensajes anteriores
     
+    // Busco en los mensajes anteriores
+    //NSData *jsonData = ;
+    NSDictionary *jsonRecibido = [NSJSONSerialization JSONObjectWithData:[mutableUserInfo[@"data"] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+
     // Agrego banderas adicionales para ionic
-    if ([mutableUserInfo objectForKey:@"payreq"] != nil) {
+    if (jsonRecibido[@"payreq"] != nil) {
         [mutableUserInfo setValue:@"true" forKey:@"isPayReq"];
     } else {
         [mutableUserInfo setValue:@"false" forKey:@"isPayReq"];
     }
     NSNumber *tiempo = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970] * 1000];
-    
+
+    // Agrego el timestamp en el campo "hnr"
     [mutableUserInfo setValue:[tiempo stringValue] forKey:@"hnr"];
-    
-    // Guardo el nuevo JSON
-    [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
+
+    // Guardo el nuevo JSON pero primero reviso si es repetido el ID
+    int i;
+    int encontrado = 0;
+    for (i = 0; i<[mcs count]; i++) {
+        NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
+        NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+        // Si tiene el mismo ID que otro mensaje, lo sustituyo.
+        if ([jsonRecibido[@"payreq"][@"infoCif"][@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
+            NSLog(@"objeto sustituido por id identico: %@", jsonRecibido);
+            encontrado = 1;
+            [mcs replaceObjectAtIndex:i withObject:[jsonRecibido description]];
+            break;
+        }
+    }
+    // Si no fue encontrado, lo agrego al final.
+    if (!encontrado) {
+        [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
+    }
 
     [prefs setObject:[mcs copy] forKey:@"mcs"];
     // Por ahora guardo el objeto allNotifications identico al mcs

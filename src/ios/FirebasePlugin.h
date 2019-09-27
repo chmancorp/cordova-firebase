@@ -46,6 +46,6 @@
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
 @property (nonatomic, strong) NSString *tokenPrivado;
 @property (nonatomic, strong) NSString *tokenBanxico;
-
+@property (nonatomic, strong) NSString *idFirebaseBanxico;
 
 @end

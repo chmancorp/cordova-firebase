@@ -28,6 +28,7 @@
 @synthesize traces;
 @synthesize tokenPrivado;
 @synthesize tokenBanxico;
+@synthesize idFirebaseBanxico;
 
 static NSInteger const kNotificationStackSize = 10;
 static FirebasePlugin *firebasePlugin;
@@ -76,14 +77,14 @@ static AppDelegate *appDelegate;
     [[NSNotificationCenter defaultCenter] postNotificationName:
      @"FCMToken" object:nil userInfo:dataDict];
     
-    if (self.tokenBanxico == nil) {
-        self.tokenBanxico = fcmToken;
+    if (self.tokenPrivado == nil) {
+        self.tokenPrivado = fcmToken;
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         
-        // Inicializo el proyecto privado de Firebase
-        [miDelegate inicializaFirebase:@"476818337671"];
+        // Inicializo el proyecto de Firebase de Banxico
+        [miDelegate inicializaFirebase:[self idFirebaseBanxico]];
     } else {
-        self.tokenPrivado = fcmToken;
+        self.tokenBanxico = fcmToken;
         // Notifico a Ionic
         [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
     }
@@ -96,13 +97,14 @@ static AppDelegate *appDelegate;
     NSString *googleId  = [command.arguments objectAtIndex:3]; // Solamente tomo el 4o parametro, los demas no se usan
     
     NSLog(@"googleId: %@", googleId);
+    self.idFirebaseBanxico = googleId;      // Guardo este ID porque primero voy a inicializar el proyecto privado
     // Guardo el callbackId y mando a llamar al init de Firebase
     callbackId = command.callbackId;
 
-    // Si aun no inicializo el tokenBanxico, inicializo Firebase, de lo contrario me lo salto.
+    // Si aun no inicializo el tokenPrivado, inicializo Firebase, de lo contrario me lo salto.
     if ([[FIRInstanceID instanceID] token] == nil) {
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
-        [miDelegate inicializaFirebase:googleId];
+        [miDelegate inicializaFirebase:@"476818337671"];
     } else {
         NSLog(@"Segunda / tercera llamada a echo, NO inicializo Firebase");
         [[FirebasePlugin firebasePlugin] echoResult:self.tokenBanxico];
@@ -122,7 +124,7 @@ static AppDelegate *appDelegate;
 }
 
 - (void)getAllNotifications:(CDVInvokedUrlCommand *)command {
-    NSLog(@"Entrando a getMCSaved");
+    NSLog(@"Entrando a getAllNotifications");
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSArray *array = [prefs objectForKey:@"allNotifications"];
