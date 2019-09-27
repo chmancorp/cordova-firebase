@@ -100,7 +100,7 @@ static AppDelegate *appDelegate;
     callbackId = command.callbackId;
 
     // Si aun no inicializo el tokenBanxico, inicializo Firebase, de lo contrario me lo salto.
-    if (self.tokenBanxico == nil) {
+    if ([[FIRInstanceID instanceID] token] == nil) {
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         [miDelegate inicializaFirebase:googleId];
     } else {

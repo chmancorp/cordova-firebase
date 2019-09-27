@@ -270,7 +270,8 @@
     } else {
         [mutableUserInfo setValue:@"false" forKey:@"isPayReq"];
     }
-    NSNumber *tiempo = [NSNumber numberWithDouble:<#(double)#>];
+    NSNumber *tiempo = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970] * 1000];
+    
     [mutableUserInfo setValue:[tiempo stringValue] forKey:@"hnr"];
     
     // Guardo el nuevo JSON
