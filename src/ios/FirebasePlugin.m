@@ -135,6 +135,46 @@ static AppDelegate *appDelegate;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
+    NSLog(@"Entrando a postponeChargeRequest");
+    NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
+    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [prefs objectForKey:@"mcs"];
+    if (array == nil) { // Si no hay nada en el objeto, regreso error.
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    NSMutableArray *mcs = [array mutableCopy];
+
+    NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
+    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+
+    int i = 0;
+    int encontrado = 0;
+    for (i = 0; i<[mcs count]; i++) {
+        NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
+        NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+        // Si tiene el mismo ID que otro mensaje, lo sustituyo.
+        if ([jsonMensajeCobro[@"payreq"][@"infoCif"][@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
+            NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
+            encontrado = 1;
+            [mcs replaceObjectAtIndex:i withObject:[jsonMensajeCobro description]];
+            break;
+        }
+    }
+
+    CDVPluginResult *pluginResult;
+    if (encontrado) {
+        // Si lo encuentro, devuelvo OK y el arreglo nuevo con los mensajes (incluyendo el sustituido)
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:[mcs copy]];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 // DEPRECATED - alias of getToken
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {

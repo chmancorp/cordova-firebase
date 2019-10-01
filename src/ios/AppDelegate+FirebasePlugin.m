@@ -242,7 +242,6 @@
     NSMutableArray *mcs = [array mutableCopy];
     
     // Busco en los mensajes anteriores
-    //NSData *jsonData = ;
     NSDictionary *jsonRecibido = [NSJSONSerialization JSONObjectWithData:[mutableUserInfo[@"data"] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
 
     // Agrego banderas adicionales para ionic

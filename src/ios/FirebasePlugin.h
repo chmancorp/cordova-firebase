@@ -8,6 +8,7 @@
 - (void)echoResult:(NSString *)idN;
 - (void)echo:(CDVInvokedUrlCommand *)command;
 - (void)getMCSaved:(CDVInvokedUrlCommand *)command;
+- (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command;
 - (void)getAllNotifications:(CDVInvokedUrlCommand *)command;
 - (void)getVerificationID:(CDVInvokedUrlCommand*)command;
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
