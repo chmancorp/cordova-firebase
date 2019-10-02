@@ -138,8 +138,8 @@
 }
 
 - (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken {
-    NSLog(@"FCM registration token: %@", fcmToken);
-    // Notify about received token.
+    NSLog(@"FCM registration token en didReceiveRegistrationToken: %@", fcmToken);
+
     NSDictionary *dataDict = [NSDictionary dictionaryWithObject:fcmToken forKey:@"token"];
     [[NSNotificationCenter defaultCenter] postNotificationName:
      @"FCMToken" object:nil userInfo:dataDict];

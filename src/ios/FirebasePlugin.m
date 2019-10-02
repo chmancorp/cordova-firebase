@@ -94,6 +94,12 @@ static AppDelegate *appDelegate;
 - (void)echo:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a echo");
     
+    if ([FIRApp defaultApp])
+        [[FIRApp defaultApp] deleteApp:^(BOOL sePudoBorrar){
+            NSLog(@"App borrada: %d", sePudoBorrar);
+        }];
+    //[[FIRMessaging messaging] disconnect];
+
     NSString *googleId  = [command.arguments objectAtIndex:3]; // Solamente tomo el 4o parametro, los demas no se usan
     
     NSLog(@"googleId: %@", googleId);
