@@ -154,6 +154,35 @@ static AppDelegate *appDelegate;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+/**
+ Estructura mc:
+ mc: {
+     s: any;
+     id: any;
+     isPayReq: any;
+     mc: {
+         id: any;
+         cc: any;
+         mt: any;
+         hs: any;
+         idCE: any;
+         hl: any;
+         e: any;
+         v: {
+             nc: any;
+             dv: any;
+             tc: any;
+             cb: any;
+             ci: any;
+             nb: any;
+             tc2: any;
+         };
+         tp: any;
+         pc: any;
+         countPost: any;
+     };
+ }
+ */
 - (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a postponeChargeRequest");
     NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
@@ -177,7 +206,7 @@ static AppDelegate *appDelegate;
         NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
         NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
         // Si tiene el mismo ID que otro mensaje, lo sustituyo.
-        if ([jsonMensajeCobro[@"payreq"][@"infoCif"][@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
+        if ([jsonMensajeCobro[@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
             NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
             encontrado = 1;
             [mcs replaceObjectAtIndex:i withObject:[jsonMensajeCobro description]];
