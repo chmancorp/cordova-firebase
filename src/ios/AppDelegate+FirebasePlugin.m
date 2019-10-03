@@ -245,7 +245,8 @@
     NSDictionary *jsonRecibido = [NSJSONSerialization JSONObjectWithData:[mutableUserInfo[@"data"] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
 
     // Agrego banderas adicionales para ionic
-    if (jsonRecibido[@"payreq"] != nil) {
+    //if (jsonRecibido[@"payreq"] != nil) {
+    if ([mutableUserInfo objectForKey:@"payreq"]) {
         [mutableUserInfo setValue:@"true" forKey:@"isPayReq"];
     } else {
         [mutableUserInfo setValue:@"false" forKey:@"isPayReq"];
@@ -256,7 +257,7 @@
     [mutableUserInfo setValue:[tiempo stringValue] forKey:@"hnr"];
 
     // Guardo el nuevo JSON pero primero reviso si es repetido el ID
-    int i;
+    /*int i;
     int encontrado = 0;
     for (i = 0; i<[mcs count]; i++) {
         NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
@@ -272,7 +273,8 @@
     // Si no fue encontrado, lo agrego al final.
     if (!encontrado) {
         [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
-    }
+    }*/
+    [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
 
     [prefs setObject:[mcs copy] forKey:@"mcs"];
     // Por ahora guardo el objeto allNotifications identico al mcs

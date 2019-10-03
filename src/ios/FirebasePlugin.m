@@ -77,7 +77,7 @@ static AppDelegate *appDelegate;
     [[NSNotificationCenter defaultCenter] postNotificationName:
      @"FCMToken" object:nil userInfo:dataDict];
     
-    if (self.tokenPrivado == nil) {
+/*    if (self.tokenPrivado == nil) {
         self.tokenPrivado = fcmToken;
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         
@@ -87,6 +87,17 @@ static AppDelegate *appDelegate;
         self.tokenBanxico = fcmToken;
         // Notifico a Ionic
         [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
+    }*/
+    if (self.tokenBanxico == nil) {
+        self.tokenBanxico = fcmToken;
+        AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
+        
+        // Inicializo el proyecto de Firebase de Banxico
+        [miDelegate inicializaFirebase:@"476818337671"];
+    } else {
+        self.tokenPrivado = fcmToken;
+        // Notifico a Ionic
+        [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
     }
 }
 
@@ -94,10 +105,12 @@ static AppDelegate *appDelegate;
 - (void)echo:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a echo");
     
+    /*
     if ([FIRApp defaultApp])
         [[FIRApp defaultApp] deleteApp:^(BOOL sePudoBorrar){
             NSLog(@"App borrada: %d", sePudoBorrar);
         }];
+     */
     //[[FIRMessaging messaging] disconnect];
 
     NSString *googleId  = [command.arguments objectAtIndex:3]; // Solamente tomo el 4o parametro, los demas no se usan
@@ -110,7 +123,7 @@ static AppDelegate *appDelegate;
     // Si aun no inicializo el tokenPrivado, inicializo Firebase, de lo contrario me lo salto.
     if ([[FIRInstanceID instanceID] token] == nil) {
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
-        [miDelegate inicializaFirebase:@"476818337671"];
+        [miDelegate inicializaFirebase:googleId];
     } else {
         NSLog(@"Segunda / tercera llamada a echo, NO inicializo Firebase");
         [[FirebasePlugin firebasePlugin] echoResult:self.tokenBanxico];
