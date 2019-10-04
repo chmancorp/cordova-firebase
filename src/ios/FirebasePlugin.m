@@ -124,13 +124,13 @@ static AppDelegate *appDelegate;
         NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
         NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
         // Si tiene el mismo ID que otro mensaje, lo sustituyo.
-        if ([jsonMensajeCobro[@"mc"][@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
+        if ([jsonMensajeCobro[@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
             NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
             encontrado = 1;
 
             NSMutableDictionary *payreq = [jsonParseado mutableCopy];
             NSMutableDictionary *infoCif = [payreq[@"payreq"] mutableCopy];
-            infoCif[@"mc"] = jsonMensajeCobro[@"mc"];
+            infoCif[@"mc"] = jsonMensajeCobro;
             payreq[@"payreq"] = infoCif;
             [mcs replaceObjectAtIndex:i withObject:[payreq copy]];
 
