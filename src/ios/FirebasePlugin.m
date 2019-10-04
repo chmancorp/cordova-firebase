@@ -101,6 +101,56 @@ static AppDelegate *appDelegate;
     }
 }
 
+- (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
+    NSLog(@"Entrando a postponeChargeRequest");
+    NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
+    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [prefs objectForKey:@"mcs"];
+    if (array == nil) { // Si no hay nada en el objeto, regreso error.
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    NSMutableArray *mcs = [array mutableCopy];
+
+    NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
+    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+
+    int i = 0;
+    int encontrado = 0;
+    for (i = 0; i<[mcs count]; i++) {
+        NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
+        NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+        // Si tiene el mismo ID que otro mensaje, lo sustituyo.
+        if ([jsonMensajeCobro[@"mc"][@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
+            NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
+            encontrado = 1;
+
+            NSMutableDictionary *payreq = [jsonParseado mutableCopy];
+            NSMutableDictionary *infoCif = [payreq[@"payreq"] mutableCopy];
+            infoCif[@"mc"] = jsonMensajeCobro[@"mc"];
+            payreq[@"payreq"] = infoCif;
+            [mcs replaceObjectAtIndex:i withObject:[payreq copy]];
+
+            [prefs setObject:[mcs copy] forKey:@"mcs"];
+            [prefs synchronize];
+
+            break;
+        }
+    }
+
+    CDVPluginResult *pluginResult;
+    if (encontrado) {
+        // Si lo encuentro, devuelvo OK y el arreglo nuevo con los mensajes (incluyendo el sustituido)
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:[mcs copy]];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 /** echo del idN */
 - (void)echo:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a echo");
@@ -151,76 +201,6 @@ static AppDelegate *appDelegate;
     NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
     NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:mensajes];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-/**
- Estructura mc:
- mc: {
-     s: any;
-     id: any;
-     isPayReq: any;
-     mc: {
-         id: any;
-         cc: any;
-         mt: any;
-         hs: any;
-         idCE: any;
-         hl: any;
-         e: any;
-         v: {
-             nc: any;
-             dv: any;
-             tc: any;
-             cb: any;
-             ci: any;
-             nb: any;
-             tc2: any;
-         };
-         tp: any;
-         pc: any;
-         countPost: any;
-     };
- }
- */
-- (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
-    NSLog(@"Entrando a postponeChargeRequest");
-    NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
-    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    NSArray *array = [prefs objectForKey:@"mcs"];
-    if (array == nil) { // Si no hay nada en el objeto, regreso error.
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        return;
-    }
-    NSMutableArray *mcs = [array mutableCopy];
-
-    NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
-    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
-
-    int i = 0;
-    int encontrado = 0;
-    for (i = 0; i<[mcs count]; i++) {
-        NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
-        NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-        // Si tiene el mismo ID que otro mensaje, lo sustituyo.
-        if ([jsonMensajeCobro[@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
-            NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
-            encontrado = 1;
-            [mcs replaceObjectAtIndex:i withObject:[jsonMensajeCobro description]];
-            break;
-        }
-    }
-
-    CDVPluginResult *pluginResult;
-    if (encontrado) {
-        // Si lo encuentro, devuelvo OK y el arreglo nuevo con los mensajes (incluyendo el sustituido)
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:[mcs copy]];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
-    }
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
