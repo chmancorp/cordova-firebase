@@ -104,19 +104,30 @@ static AppDelegate *appDelegate;
 - (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a postponeChargeRequest");
     NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
-    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-
+    if (mensajeCobro == nil) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    NSError *e = nil;
+    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&e];
+    if (!jsonMensajeCobro) {
+      NSLog(@"Error parseando jsonMensajeCobro: %@", e);
+    }
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSArray *array = [prefs objectForKey:@"mcs"];
     if (array == nil) { // Si no hay nada en el objeto, regreso error.
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"No se encontró ningún mc con el id %@", jsonMensajeCobro[@"id"]]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
     NSMutableArray *mcs = [array mutableCopy];
 
-    NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
-    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+    /*NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:&e];
+    if (!json) {
+      NSLog(@"Error parseando json: %@", e);
+    }
+    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];*/
 
     int i = 0;
     int encontrado = 0;
@@ -128,11 +139,13 @@ static AppDelegate *appDelegate;
             NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
             encontrado = 1;
 
-            NSMutableDictionary *payreq = [jsonParseado mutableCopy];
-            NSMutableDictionary *infoCif = [payreq[@"payreq"] mutableCopy];
-            infoCif[@"mc"] = jsonMensajeCobro;
-            payreq[@"payreq"] = infoCif;
-            [mcs replaceObjectAtIndex:i withObject:[payreq copy]];
+            NSMutableDictionary *jsonModificado = [jsonParseado mutableCopy];
+            NSMutableDictionary *payreq = [jsonParseado[@"payreq"] mutableCopy];
+            NSMutableDictionary *infoCif = [payreq[@"infoCif"] mutableCopy];
+            infoCif[@"mc"] = jsonMensajeCobro[@"mc"];
+            payreq[@"infoCif"] = infoCif;
+            jsonModificado[@"payreq"] = payreq;
+            [mcs replaceObjectAtIndex:i withObject:[jsonModificado copy]];
 
             [prefs setObject:[mcs copy] forKey:@"mcs"];
             [prefs synchronize];
