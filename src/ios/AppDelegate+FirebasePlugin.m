@@ -54,6 +54,10 @@
     NSLog(@"Entrando a inicializaFirebase, googleId: %@", googleId);
     
     // Si ya hay una app, la borro.
+    NSDictionary *dict = [FIRApp allApps];
+    for (id key in [dict allKeys])
+        NSLog(@"%@ - %@", key, dict[key]);
+    
     if ([FIRApp defaultApp])
         [[FIRApp defaultApp] deleteApp:^(BOOL sePudoBorrar){
             NSLog(@"App borrada: %d", sePudoBorrar);
@@ -65,7 +69,7 @@
     NSLog(@"google app id: %@", [options googleAppID]);
     
     [FIRApp configureWithOptions:options];
-    //[FIRApp configureWithName:googleId options:options];
+    //[FIRApp configureWithName:@"privada" options:options];
 
     /*
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
@@ -146,6 +150,7 @@
      @"FCMToken" object:nil userInfo:dataDict];
     
     // Notifico a Ionic
+    NSLog(@"Enviando a echoResult");
     [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
 }
 
@@ -209,6 +214,16 @@
 
     [self procesaNotificacion:mutableUserInfo];
 
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    NSLog(@"Dentro de applicationWillTerminate");
+    if ([FIRApp defaultApp])
+        [[FIRApp defaultApp] deleteApp:^(BOOL sePudoBorrar){
+            NSLog(@"App borrada en applicationWilTerminate: %d", sePudoBorrar);
+        }];
+
+    [[FIRMessaging messaging] disconnect];
 }
 
 // [START ios_10_data_message]

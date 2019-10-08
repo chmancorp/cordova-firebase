@@ -66,37 +66,32 @@ static AppDelegate *appDelegate;
 }
 
 - (void)echoResult:(NSString *)idN {
+    NSLog(@"Entrando a echoResult con idN %@", idN);
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:idN];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
 - (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken {
-    NSLog(@"FCM registration token desde FirebasePlugin: %@", fcmToken);
+    NSLog(@"FCM registration token desde FirebasePlugin (1a vez): %@", fcmToken);
     // Notify about received token.
     NSDictionary *dataDict = [NSDictionary dictionaryWithObject:fcmToken forKey:@"token"];
     [[NSNotificationCenter defaultCenter] postNotificationName:
      @"FCMToken" object:nil userInfo:dataDict];
     
-/*    if (self.tokenPrivado == nil) {
-        self.tokenPrivado = fcmToken;
-        AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
-        
-        // Inicializo el proyecto de Firebase de Banxico
-        [miDelegate inicializaFirebase:[self idFirebaseBanxico]];
-    } else {
-        self.tokenBanxico = fcmToken;
-        // Notifico a Ionic
-        [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
-    }*/
     if (self.tokenBanxico == nil) {
         self.tokenBanxico = fcmToken;
+        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+        [prefs setObject:fcmToken forKey:@"tokenBanxico"];
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         
-        // Inicializo el proyecto de Firebase de Banxico
+        // Inicializo el proyecto de Firebase privado
+        NSLog(@"Llamando a inicializaFirebase por segunda vez");
         [miDelegate inicializaFirebase:@"476818337671"];
     } else {
         self.tokenPrivado = fcmToken;
         // Notifico a Ionic
+        NSLog(@"Enviando a echoResult en didReceiveRegistrationToken");
+
         [[FirebasePlugin firebasePlugin] echoResult:fcmToken];
     }
 }
@@ -179,14 +174,6 @@ static AppDelegate *appDelegate;
 - (void)echo:(CDVInvokedUrlCommand *)command {
     NSLog(@"Entrando a echo");
     
-    /*
-    if ([FIRApp defaultApp])
-        [[FIRApp defaultApp] deleteApp:^(BOOL sePudoBorrar){
-            NSLog(@"App borrada: %d", sePudoBorrar);
-        }];
-     */
-    //[[FIRMessaging messaging] disconnect];
-
     NSString *googleId  = [command.arguments objectAtIndex:3]; // Solamente tomo el 4o parametro, los demas no se usan
     
     NSLog(@"googleId: %@", googleId);
@@ -200,7 +187,10 @@ static AppDelegate *appDelegate;
         [miDelegate inicializaFirebase:googleId];
     } else {
         NSLog(@"Segunda / tercera llamada a echo, NO inicializo Firebase");
-        [[FirebasePlugin firebasePlugin] echoResult:self.tokenBanxico];
+        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+        NSString *tokenGuardado = [prefs objectForKey:@"tokenBanxico"];
+        NSLog(@"Recuperando token banxico desde disco: @%", tokenGuardado);
+        [[FirebasePlugin firebasePlugin] echoResult:tokenGuardado];
     }
 }
 
