@@ -109,11 +109,28 @@ static AppDelegate *appDelegate;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-    NSError *e = nil;
-    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&e];
-    if (!jsonMensajeCobro) {
-      NSLog(@"Error parseando jsonMensajeCobro: %@", e);
+
+    // Parseo manualmente el mensaje porque trae caracteres raros
+    NSMutableDictionary *jsonMensajeCobro = [[NSMutableDictionary alloc] init];
+    mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"{" withString:@""];
+
+    NSError *error = nil;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\s+" options:NSRegularExpressionCaseInsensitive error:&error];
+    mensajeCobro = [regex stringByReplacingMatchesInString:mensajeCobro options:0 range:NSMakeRange(0, [mensajeCobro length]) withTemplate:@""];
+    
+    NSLog(@"mensajeCobro antes de parsear: %@", mensajeCobro);
+    
+    // Inicio ciclo sobre la cadena
+    NSArray *arr = [mensajeCobro componentsSeparatedByString:@";"];
+    for (id cadena in arr) {
+        NSArray *variables = [cadena componentsSeparatedByString:@"="];
+        if (variables == nil || [variables count] < 2)
+            continue;
+        [jsonMensajeCobro setObject:variables[1] forKey:variables[0]];
     }
+    NSLog(@"mensajeCobro parseado: %@", jsonMensajeCobro);
+
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSArray *array = [prefs objectForKey:@"mcs"];
     if (array == nil) { // Si no hay nada en el objeto, regreso error.
@@ -122,12 +139,6 @@ static AppDelegate *appDelegate;
         return;
     }
     NSMutableArray *mcs = [array mutableCopy];
-
-    /*NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:&e];
-    if (!json) {
-      NSLog(@"Error parseando json: %@", e);
-    }
-    NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];*/
 
     int i = 0;
     int encontrado = 0;
