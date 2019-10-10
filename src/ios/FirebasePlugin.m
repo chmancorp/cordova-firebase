@@ -101,7 +101,7 @@ static AppDelegate *appDelegate;
     NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
     NSLog(@"2. despues de inicializar");
     if (mensajeCobro == nil) {
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id recibido"];
         NSLog(@"2.1. Mensajecobro nil");
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         NSLog(@"2.2. Despues de commandDelegate");
@@ -112,28 +112,32 @@ static AppDelegate *appDelegate;
     NSMutableDictionary *jsonMensajeCobro = [[NSMutableDictionary alloc] init];
     NSLog(@"3. Despues de init dictionary");
     mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    NSLog(@"4. Despues de 1er replace");
+    NSLog(@"4. Despues de 1er replace: %@", mensajeCobro);
     mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSLog(@"5. Despues de 2do replace");
+    NSLog(@"5. Despues de 2do replace: %@", mensajeCobro);
 
     NSError *error = nil;
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\s+" options:NSRegularExpressionCaseInsensitive error:&error];
     mensajeCobro = [regex stringByReplacingMatchesInString:mensajeCobro options:0 range:NSMakeRange(0, [mensajeCobro length]) withTemplate:@""];
     
-    NSLog(@"6. mensajeCobro antes de parsear: %@", mensajeCobro);
+    NSLog(@"6. mensajeCobro despues de parsear: %@", mensajeCobro);
     
     // Inicio ciclo sobre la cadena
     NSArray *arr = [mensajeCobro componentsSeparatedByString:@";"];
     NSLog(@"6. despues de init arreglo");
+    NSLog(@"6.0.1 arreglo: %@", arr);
     for (id cadena in arr) {
         NSArray *variables = [cadena componentsSeparatedByString:@"="];
         NSLog(@"6.1 arreglo separado por = ");
+        NSLog(@"6.2 arreglo local: %@", variables);
         if (variables == nil || [variables count] < 2)
             continue;
         [jsonMensajeCobro setObject:variables[1] forKey:variables[0]];
-        NSLog(@"6.2 despues de setObject");
+        NSLog(@"6.3 despues de asignar a jsonMensajeCobro ");
+        NSLog(@"6.4 despues de setObject, variable: %@, key %@", variables[1], variables[0]);
     }
-    NSLog(@"mensajeCobro parseado: %@", jsonMensajeCobro);
+    NSLog(@"7. Saliendo de ciclo dentro de array ");
+    NSLog(@"8. mensajeCobro parseado: %@", jsonMensajeCobro);
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSArray *array = [prefs objectForKey:@"mcs"];
