@@ -147,16 +147,22 @@ static AppDelegate *appDelegate;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
+    NSLog(@"9. array not nil");
     NSMutableArray *mcs = [array mutableCopy];
 
     int i = 0;
     int encontrado = 0;
+    NSLog(@"10. antes de entrar al for");
     for (i = 0; i<[mcs count]; i++) {
         NSDictionary *jsonMensaje = [mcs objectAtIndex:i];
+        NSLog(@"11. jsonmensaje local #%d: %@", i, jsonMensaje);
         NSDictionary *jsonParseado = [NSJSONSerialization JSONObjectWithData:[[jsonMensaje description] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+        NSLog(@"12. despues de jsonParseado");
+        NSLog(@"objetos: %@, %@", jsonMensajeCobro[@"id"], jsonParseado[@"payreq"][@"infoCif"][@"id"]);
+
         // Si tiene el mismo ID que otro mensaje, lo sustituyo.
         if ([jsonMensajeCobro[@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
-            NSLog(@"objeto sustituido por id identico: %@", jsonMensajeCobro);
+            NSLog(@"13. objeto sustituido por id identico: %@", jsonMensajeCobro);
             encontrado = 1;
 
             NSMutableDictionary *jsonModificado = [jsonParseado mutableCopy];
@@ -173,6 +179,8 @@ static AppDelegate *appDelegate;
             break;
         }
     }
+
+    NSLog(@"14. encontrado: %d", encontrado);
 
     CDVPluginResult *pluginResult;
     if (encontrado) {
