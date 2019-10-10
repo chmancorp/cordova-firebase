@@ -109,7 +109,12 @@ static AppDelegate *appDelegate;
         return;
     }
 
+    // Parseo el mensaje normalmente
+    NSDictionary *jsonMensajeCobro = [NSJSONSerialization JSONObjectWithData:[mensajeCobro dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+    NSLog(@"3. Despues de parseo normal");
+
     // Parseo manualmente el mensaje porque trae caracteres raros
+    /*
     NSMutableDictionary *jsonMensajeCobro = [[NSMutableDictionary alloc] init];
     NSLog(@"3. Despues de init dictionary");
     mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"}" withString:@""];
@@ -138,6 +143,7 @@ static AppDelegate *appDelegate;
         NSLog(@"6.4 despues de setObject, variable: %@, key %@", variables[1], variables[0]);
     }
     NSLog(@"7. Saliendo de ciclo dentro de array ");
+    */
     NSLog(@"8. mensajeCobro parseado: %@", jsonMensajeCobro);
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
