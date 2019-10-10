@@ -99,6 +99,7 @@ static AppDelegate *appDelegate;
 - (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
     NSLog(@"1. Entrando a postponeChargeRequest");
     NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
+    NSLog(@"1.1 Clase mensajeCobro: %@", [mensajeCobro class]);
     NSLog(@"2. despues de inicializar");
     if (mensajeCobro == nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id recibido"];
