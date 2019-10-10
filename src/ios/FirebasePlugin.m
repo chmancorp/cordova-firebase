@@ -97,32 +97,41 @@ static AppDelegate *appDelegate;
 }
 
 - (void)postponeChargeRequest:(CDVInvokedUrlCommand *)command {
-    NSLog(@"Entrando a postponeChargeRequest");
+    NSLog(@"1. Entrando a postponeChargeRequest");
     NSString *mensajeCobro  = [command.arguments objectAtIndex:0]; // El 1er argumento es el mensaje de cobro
+    NSLog(@"2. despues de inicializar");
     if (mensajeCobro == nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No se encontró ningún mc con el id %@"];
+        NSLog(@"2.1. Mensajecobro nil");
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        NSLog(@"2.2. Despues de commandDelegate");
         return;
     }
 
     // Parseo manualmente el mensaje porque trae caracteres raros
     NSMutableDictionary *jsonMensajeCobro = [[NSMutableDictionary alloc] init];
+    NSLog(@"3. Despues de init dictionary");
     mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    NSLog(@"4. Despues de 1er replace");
     mensajeCobro = [mensajeCobro stringByReplacingOccurrencesOfString:@"{" withString:@""];
+    NSLog(@"5. Despues de 2do replace");
 
     NSError *error = nil;
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\s+" options:NSRegularExpressionCaseInsensitive error:&error];
     mensajeCobro = [regex stringByReplacingMatchesInString:mensajeCobro options:0 range:NSMakeRange(0, [mensajeCobro length]) withTemplate:@""];
     
-    NSLog(@"mensajeCobro antes de parsear: %@", mensajeCobro);
+    NSLog(@"6. mensajeCobro antes de parsear: %@", mensajeCobro);
     
     // Inicio ciclo sobre la cadena
     NSArray *arr = [mensajeCobro componentsSeparatedByString:@";"];
+    NSLog(@"6. despues de init arreglo");
     for (id cadena in arr) {
         NSArray *variables = [cadena componentsSeparatedByString:@"="];
+        NSLog(@"6.1 arreglo separado por = ");
         if (variables == nil || [variables count] < 2)
             continue;
         [jsonMensajeCobro setObject:variables[1] forKey:variables[0]];
+        NSLog(@"6.2 despues de setObject");
     }
     NSLog(@"mensajeCobro parseado: %@", jsonMensajeCobro);
 
