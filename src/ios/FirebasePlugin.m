@@ -175,12 +175,16 @@ static AppDelegate *appDelegate;
             NSMutableDictionary *payreq = [jsonParseado[@"payreq"] mutableCopy];
             NSMutableDictionary *infoCif = [payreq[@"infoCif"] mutableCopy];
             infoCif[@"mc"] = jsonMensajeCobro[@"mc"];
+            infoCif[@"s"] = jsonMensajeCobro[@"s"];
+            infoCif[@"isPayReq"] = jsonMensajeCobro[@"isPayReq"];
+            infoCif[@"hnr"] = jsonMensajeCobro[@"hnr"];
             payreq[@"infoCif"] = infoCif;
             jsonModificado[@"payreq"] = payreq;
             [mcs replaceObjectAtIndex:i withObject:[jsonModificado copy]];
 
             [prefs setObject:[mcs copy] forKey:@"mcs"];
             [prefs synchronize];
+            NSLog(@"13.1 Preferencias guardadas: %@", [prefs objectForKey:@"mcs"]);
 
             break;
         }
