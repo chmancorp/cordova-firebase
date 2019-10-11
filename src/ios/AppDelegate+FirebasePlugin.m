@@ -115,7 +115,7 @@
     self.applicationInBackground = @(YES);
     
     // Para resetear todas las notificaciones guardadas
-    /*
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *dict = [defaults dictionaryRepresentation];
     for (id key in dict) {
@@ -123,7 +123,7 @@
     }
     [defaults synchronize];
     NSLog(@"Preferencias guardadas: %@", [defaults objectForKey:@"mensajes"]);
-    */
+    
 
 
     return YES;
