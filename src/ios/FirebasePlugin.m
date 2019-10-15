@@ -82,6 +82,7 @@ static AppDelegate *appDelegate;
         self.tokenBanxico = fcmToken;
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         [prefs setObject:fcmToken forKey:@"tokenBanxico"];
+        [prefs synchronize];
         AppDelegate *miDelegate = [[UIApplication sharedApplication] delegate];
         
         // Inicializo el proyecto de Firebase privado
@@ -225,7 +226,7 @@ static AppDelegate *appDelegate;
         NSLog(@"Segunda / tercera llamada a echo, NO inicializo Firebase");
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         NSString *tokenGuardado = [prefs objectForKey:@"tokenBanxico"];
-        NSLog(@"Recuperando token banxico desde disco: @%", tokenGuardado);
+        NSLog(@"Recuperando token banxico desde disco: %@", tokenGuardado);
         [[FirebasePlugin firebasePlugin] echoResult:tokenGuardado];
     }
 }
@@ -235,9 +236,13 @@ static AppDelegate *appDelegate;
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     NSArray *array = [prefs objectForKey:@"mcs"];
+    
+    NSLog(@"Array guardado: %@", array);
 
     NSData *json = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
+    NSLog(@"json convertido: %@", json);
     NSString *mensajes = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+    NSLog(@"mensajes decodificados: %@", mensajes);
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:mensajes];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
