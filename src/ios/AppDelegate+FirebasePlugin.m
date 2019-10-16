@@ -261,20 +261,20 @@
     NSMutableArray *mcs = [array mutableCopy];
     
     // Busco en los mensajes anteriores
-    NSDictionary *jsonRecibido = [NSJSONSerialization JSONObjectWithData:[mutableUserInfo[@"data"] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+    NSMutableDictionary *jsonRecibido = [NSJSONSerialization JSONObjectWithData:[mutableUserInfo[@"data"] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil];
     NSLog(@"JSON recibido: %@", jsonRecibido);
 
     // Agrego banderas adicionales para ionic
     //if ([mutableUserInfo objectForKey:@"payreq"]) {
     if (jsonRecibido[@"payreq"] != nil) {
-        [mutableUserInfo setValue:@"true" forKey:@"isPayReq"];
+        [jsonRecibido setValue:@"true" forKey:@"isPayReq"];
     } else {
-        [mutableUserInfo setValue:@"false" forKey:@"isPayReq"];
+        [jsonRecibido setValue:@"false" forKey:@"isPayReq"];
     }
     NSNumber *tiempo = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970] * 1000];
 
     // Agrego el timestamp en el campo "hnr"
-    [mutableUserInfo setValue:[tiempo stringValue] forKey:@"hnr"];
+    [jsonRecibido setValue:[tiempo stringValue] forKey:@"hnr"];
 
     // Guardo el nuevo JSON pero primero reviso si es repetido el ID
     int i;
@@ -292,7 +292,7 @@
     }
     // Si no fue encontrado, lo agrego al final.
     if (!encontrado) {
-        [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
+        [mcs addObject:jsonRecibido];
     }
     //[mcs addObject:[mutableUserInfo objectForKey:@"data"]];
 
