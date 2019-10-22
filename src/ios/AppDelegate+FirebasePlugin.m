@@ -266,15 +266,21 @@
 
     // Agrego banderas adicionales para ionic
     //if ([mutableUserInfo objectForKey:@"payreq"]) {
+    /*
     if (jsonRecibido[@"payreq"] != nil) {
         [jsonRecibido setValue:@"true" forKey:@"isPayReq"];
     } else {
         [jsonRecibido setValue:@"false" forKey:@"isPayReq"];
-    }
+    }*/
     NSNumber *tiempo = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970] * 1000];
 
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    [formatter setRoundingMode:NSNumberFormatterRoundHalfUp];
+    [formatter setMaximumFractionDigits:0];
+    NSLog(@"%@",[formatter  stringFromNumber:tiempo]);
+
     // Agrego el timestamp en el campo "hnr"
-    [jsonRecibido setValue:[tiempo stringValue] forKey:@"hnr"];
+    [jsonRecibido setValue:[formatter  stringFromNumber:tiempo] forKey:@"hnr"];
 
     // Guardo el nuevo JSON pero primero reviso si es repetido el ID
     int i;
