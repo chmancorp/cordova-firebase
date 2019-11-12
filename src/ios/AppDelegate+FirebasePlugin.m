@@ -122,7 +122,7 @@
         [defaults removeObjectForKey:key];
     }
     [defaults synchronize];
-    NSLog(@"Preferencias guardadas: %@", [defaults objectForKey:@"mensajes"]);
+    NSLog(@"Preferencias guardadas para: %@", [defaults objectForKey:@"mensajes"]);
     
 
 
