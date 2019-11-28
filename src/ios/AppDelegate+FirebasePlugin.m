@@ -258,14 +258,22 @@
         array = [[NSArray alloc] init];
     }
     NSMutableArray *mcs = [array mutableCopy];
-    
+
+    NSArray *arrayAllNot = [prefs objectForKey:@"allNotifications"];
+    if (arrayAllNot == nil) {
+        arrayAllNot = [[NSArray alloc] init];
+    }
+    NSMutableArray *allNotifications = [arrayAllNot mutableCopy];
+
     // Busco en los mensajes anteriores
     NSDictionary *jsonRecibido = [NSJSONSerialization JSONObjectWithData:[mutableUserInfo[@"data"] dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
     NSLog(@"JSON recibido: %@", jsonRecibido);
+    bool isPayReq = false;
 
     // Agrego banderas adicionales para ionic
     //if ([mutableUserInfo objectForKey:@"payreq"]) {
     if (jsonRecibido[@"payreq"] != nil) {
+        isPayReq = true;
         [mutableUserInfo setValue:@"true" forKey:@"isPayReq"];
     } else {
         [mutableUserInfo setValue:@"false" forKey:@"isPayReq"];
@@ -291,13 +299,14 @@
     }
     // Si no fue encontrado, lo agrego al final.
     if (!encontrado) {
-        [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
+        if (isPayReq)
+            [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
+        [allNotifications addObject:[mutableUserInfo objectForKey:@"data"]];
     }
-    //[mcs addObject:[mutableUserInfo objectForKey:@"data"]];
 
     [prefs setObject:[mcs copy] forKey:@"mcs"];
     // Por ahora guardo el objeto allNotifications identico al mcs
-    [prefs setObject:[mcs copy] forKey:@"allNotifications"];
+    [prefs setObject:[allNotifications copy] forKey:@"allNotifications"];
     [prefs synchronize];
     
     NSLog(@"Preferencias guardadas: %@", [prefs objectForKey:@"mcs"]);
