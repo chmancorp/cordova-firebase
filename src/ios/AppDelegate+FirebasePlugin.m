@@ -299,19 +299,21 @@
     }
     // Si no fue encontrado, lo agrego al final.
     if (!encontrado) {
+        // Agrego el objeto a mcs si es mensaje de cobro, o a AllNotifications si es de otro tipo
         if (isPayReq)
             [mcs addObject:[mutableUserInfo objectForKey:@"data"]];
-        [allNotifications addObject:[mutableUserInfo objectForKey:@"data"]];
+        else
+            [allNotifications addObject:[mutableUserInfo objectForKey:@"data"]];
     }
 
-    [prefs setObject:[mcs copy] forKey:@"mcs"];
-    // Por ahora guardo el objeto allNotifications identico al mcs
+    [prefs setObject:[mcs copy]              forKey:@"mcs"];
     [prefs setObject:[allNotifications copy] forKey:@"allNotifications"];
     [prefs synchronize];
     
-    NSLog(@"Preferencias guardadas: %@", [prefs objectForKey:@"mcs"]);
-    
-    // Mando la notificacion via el plugin
+    NSLog(@"MCs guardados: %@", [prefs objectForKey:@"mcs"]);
+    NSLog(@"Notificaciones guardadas: %@", [prefs objectForKey:@"allNotifications"]);
+
+    // Mando la notificacion via el plugin, por si ionic lo necesita.
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
