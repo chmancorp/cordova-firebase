@@ -293,7 +293,10 @@
         if ([jsonRecibido[@"payreq"][@"infoCif"][@"id"] isEqual:jsonParseado[@"payreq"][@"infoCif"][@"id"]]) {
             NSLog(@"objeto sustituido por id identico: %@", jsonRecibido);
             encontrado = 1;
-            [mcs replaceObjectAtIndex:i withObject:[jsonRecibido description]];
+            NSData *jsonTmp = [NSJSONSerialization dataWithJSONObject:array options:0 error:nil];
+            NSString *mensajeString = [[NSString alloc] initWithData:jsonTmp encoding:NSUTF8StringEncoding];
+
+            [mcs replaceObjectAtIndex:i withObject:mensajeString];
             break;
         }
     }

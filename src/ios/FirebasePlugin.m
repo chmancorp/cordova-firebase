@@ -187,13 +187,13 @@ static AppDelegate *appDelegate;
 
             [prefs setObject:[mcs copy] forKey:@"mcs"];
             [prefs synchronize];
-            NSLog(@"13.1 Preferencias guardadas: %@", [prefs objectForKey:@"mcs"]);
-            for (i=0; i<[mcs count]; i++)
-                NSLog(@"13.2.%d preferencia: %@", i, [mcs objectAtIndex:i]);
 
             break;
         }
     }
+    NSLog(@"13.1 Preferencias guardadas: %@", [prefs objectForKey:@"mcs"]);
+    for (i=0; i<[mcs count]; i++)
+        NSLog(@"13.2.%d preferencia: %@", i, [mcs objectAtIndex:i]);
 
     NSLog(@"14. encontrado: %d", encontrado);
 
